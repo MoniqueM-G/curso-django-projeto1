@@ -1,0 +1,128 @@
+{% load static %} {% comment %} Carrega os arquivos estáticos (estilo, imagens, dados que vão ser sempre os mesmos) {% endcomment %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panela Cheia · Receitas para o dia a dia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#"><span>🍲</span> Panela Cheia</a>
+    <nav aria-label="Principal">
+      <ul>
+        <li><a href="#receitas">Receitas</a></li>
+        <li><a href="#categorias">Categorias</a></li>
+        <li><a href="#newsletter">Newsletter</a></li>
+      </ul>
+    </nav>
+    <a class="btn" href="#">Entrar</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <div>
+      <h1>O que vamos cozinhar hoje?</h1>
+      <p>Receitas simples, testadas e com ingredientes que você já tem em casa. Digite o que está na geladeira e a gente sugere o resto.</p>
+
+      <form class="search" role="search" onsubmit="return false">
+        <input type="search" placeholder="Ex.: frango, tomate, arroz" aria-label="Buscar receitas">
+        <button class="btn" type="submit">Buscar</button>
+      </form>
+
+      <div class="chips">
+        <a class="chip" href="#">Até 30 minutos</a>
+        <a class="chip" href="#">Vegetariano</a>
+        <a class="chip" href="#">Sem glúten</a>
+        <a class="chip" href="#">Uma panela só</a>
+      </div>
+    </div>
+
+    <a class="today" href="#">
+      <div class="emoji" aria-hidden="true">🍛</div>
+      <small>Receita do dia</small>
+      <h2>Moqueca de peixe com pirão</h2>
+      <div class="meta"><span>⏱ 45 min</span><span>👥 4 porções</span></div>
+    </a>
+  </div>
+
+  <section id="receitas">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Receitas em alta</h2>
+        <a href="#">Ver todas</a>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="thumb" aria-hidden="true">🍅</div>
+          <div class="card-body">
+            <div class="tag">Massas</div>
+            <h3>Macarrão ao molho de tomate fresco</h3>
+            <p>Molho feito na hora, com manjericão e um fio de azeite.</p>
+            <div class="info"><span>⏱ 25 min</span><span>Fácil</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="thumb" aria-hidden="true">🥗</div>
+          <div class="card-body">
+            <div class="tag">Saladas</div>
+            <h3>Salada de grão-de-bico com limão</h3>
+            <p>Fresca, nutritiva e pronta sem ligar o fogão.</p>
+            <div class="info"><span>⏱ 15 min</span><span>Fácil</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <div class="thumb" aria-hidden="true">🍰</div>
+          <div class="card-body">
+            <div class="tag">Sobremesas</div>
+            <h3>Bolo de cenoura com cobertura de chocolate</h3>
+            <p>Massa fofinha feita no liquidificador, sem erro.</p>
+            <div class="info"><span>⏱ 1 h</span><span>Médio</span></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="categorias">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Explore por categoria</h2>
+      </div>
+      <div class="cats">
+        <a class="cat" href="#"><span aria-hidden="true">🥩</span><strong>Carnes</strong><em>182 receitas</em></a>
+        <a class="cat" href="#"><span aria-hidden="true">🐟</span><strong>Peixes e frutos do mar</strong><em>96 receitas</em></a>
+        <a class="cat" href="#"><span aria-hidden="true">🥦</span><strong>Vegetarianas</strong><em>140 receitas</em></a>
+        <a class="cat" href="#"><span aria-hidden="true">🍞</span><strong>Pães e lanches</strong><em>74 receitas</em></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="newsletter">
+    <div class="wrap">
+      <div class="news">
+        <h2>Uma receita nova na sua caixa de entrada toda semana.</h2>
+        <form class="search" onsubmit="return false">
+          <input type="email" placeholder="Seu melhor e-mail" aria-label="E-mail">
+          <button class="btn" type="submit">Assinar</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Panela Cheia</span>
+    <span>Feito com carinho e muito alho.</span>
+  </div>
+</footer>
+
+</body>
+</html>
