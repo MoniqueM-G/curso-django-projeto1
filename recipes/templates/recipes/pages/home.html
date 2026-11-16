@@ -1,30 +1,5 @@
-{% load static %} {% comment %} Carrega os arquivos estáticos (estilo, imagens, dados que vão ser sempre os mesmos) {% endcomment %}
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Panela Cheia · Receitas para o dia a dia</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'recipes/styles.css' %}">
-</head>
+{% include "recipes/partials/head.html" %}
 <body>
-<header>
-  <div class="wrap nav">
-    <a class="logo" href="#"><span>🍲</span> Panela Cheia</a>
-    <nav aria-label="Principal">
-      <ul>
-        <li><a href="#receitas">Receitas</a></li>
-        <li><a href="#categorias">Categorias</a></li>
-        <li><a href="#newsletter">Newsletter</a></li>
-      </ul>
-    </nav>
-    <a class="btn" href="#">Entrar</a>
-  </div>
-</header>
-
 <main>
   <div class="wrap hero">
     <div>
@@ -77,7 +52,7 @@
             <div class="info"><span>⏱ 15 min</span><span>Fácil</span></div>
           </div>
         </article>
-        <article class="card">
+        <article class="card" href = "/recipes/3/" >
           <div class="thumb" aria-hidden="true">🍰</div>
           <div class="card-body">
             <div class="tag">Sobremesas</div>
@@ -117,12 +92,7 @@
   </section>
 </main>
 
-<footer>
-  <div class="wrap">
-    <span>© 2026 Panela Cheia</span>
-    <span>Feito com carinho e muito alho.</span>
-  </div>
-</footer>
+{% include "recipes/partials/footer.html" %}
 
 </body>
 </html>
