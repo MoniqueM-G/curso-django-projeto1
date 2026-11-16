@@ -1,4 +1,20 @@
+{% load static %} {% comment %} Carrega os arquivos estáticos (estilo, imagens, dados que vão ser sempre os mesmos) {% endcomment %}
 {% include "recipes/partials/head.html" %}
+<link rel="stylesheet" href="{% static 'recipes/styles_home.css' %}">
+</head>
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#"><span>🍲</span> Busca de Receitas</a>
+    <nav aria-label="Principal">
+      <ul>
+        <li><a href="#receitas">Receitas</a></li>
+        <li><a href="#categorias">Categorias</a></li>
+        <li><a href="#newsletter">Newsletter</a></li>
+      </ul>
+    </nav>
+    <a class="btn" href="#">Entrar</a>
+  </div>
+</header>
 <body>
 <main>
   <div class="wrap hero">
@@ -10,13 +26,6 @@
         <input type="search" placeholder="Ex.: frango, tomate, arroz" aria-label="Buscar receitas">
         <button class="btn" type="submit">Buscar</button>
       </form>
-
-      <div class="chips">
-        <a class="chip" href="#">Até 30 minutos</a>
-        <a class="chip" href="#">Vegetariano</a>
-        <a class="chip" href="#">Sem glúten</a>
-        <a class="chip" href="#">Uma panela só</a>
-      </div>
     </div>
 
     <a class="today" href="#">
@@ -53,7 +62,7 @@
           </div>
         </article>
         <article class="card" href = "/recipes/3/" >
-          <div class="thumb" aria-hidden="true">🍰</div>
+          <button class="thumb" aria-hidden="true" href = "recipes/3/">🍰</button>
           <div class="card-body">
             <div class="tag">Sobremesas</div>
             <h3>Bolo de cenoura com cobertura de chocolate</h3>
