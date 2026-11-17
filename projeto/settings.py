@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -38,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #coloca os apps aqui
-    'recipes'
+    'recipes',
+    'usuarios',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +131,6 @@ MAILERS = {
 CELERY_BROKER_URL = 'sqla+sqlite:///db.sqlite3'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+#Config auth
+AUTH_USER_MODEL = 'usuarios.Users'
