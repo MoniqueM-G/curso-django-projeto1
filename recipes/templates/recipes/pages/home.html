@@ -2,9 +2,11 @@
 {% include "recipes/partials/head.html" %}
 <link rel="stylesheet" href="{% static 'recipes/styles_home.css' %}">
 </head>
+<body>
+
 <header>
   <div class="wrap nav">
-    <a class="logo" href="#"><span>🍲</span> Busca de Receitas</a>
+    <a class="logo" href="{% url 'recipes:home' %}"> Busca de Receitas</a>
     <nav aria-label="Principal">
       <ul>
         <li><a href="#receitas">Receitas</a></li>
@@ -15,62 +17,92 @@
     <a class="btn" href="#">Entrar</a>
   </div>
 </header>
-<body>
+
 <main>
   <div class="wrap hero">
     <div>
       <h1>O que vamos cozinhar hoje?</h1>
       <p>Receitas simples, testadas e com ingredientes que você já tem em casa. Digite o que está na geladeira e a gente sugere o resto.</p>
 
-      <form class="search" role="search" onsubmit="return false">
-        <input type="search" placeholder="Ex.: frango, tomate, arroz" aria-label="Buscar receitas">
+      <form class="search" role="search" method="get" action="{% url 'recipes:home' %}">
+        <input type="search" name="q" value="{{ query|default:'' }}" placeholder="Ex.: Chicken, Beef, Cake, Pasta" aria-label="Buscar receitas">
         <button class="btn" type="submit">Buscar</button>
       </form>
     </div>
 
-    <a class="today" href="#">
-      <div class="emoji" aria-hidden="true">🍛</div>
-      <small>Receita do dia</small>
-      <h2>Moqueca de peixe com pirão</h2>
-      <div class="meta"><span>⏱ 45 min</span><span>👥 4 porções</span></div>
-    </a>
+    {% if featured_meal %}
+      <a class="today" href="{% url 'recipes:recipe' featured_meal.meal_id %}">
+        <div class="emoji" aria-hidden="true">
+          {% if featured_meal.thumb_url %}
+            <img src="{{ featured_meal.thumb_url }}" alt="{{ featured_meal.title }}" style="width: 84px; height: 84px; object-fit: cover; border-radius: 50%; border: 3px solid var(--saffron);">
+          {% else %}
+            🍛
+          {% endif %}
+        </div>
+        <small>Receita do dia</small>
+        <h2>{{ featured_meal.title }}</h2>
+        <div class="meta">
+          <span>🌍 {{ featured_meal.area }}</span>
+          <span>🥘 {{ featured_meal.ingredients_json|length }} ingredientes</span>
+        </div>
+      </a>
+    {% else %}
+      <div class="today">
+        <div class="emoji" aria-hidden="true">🍛</div>
+        <small>Catálogo em sincronização</small>
+        <h2>Preparando receitas do dia...</h2>
+        <div class="meta"><span>Atualize a página em instantes</span></div>
+      </div>
+    {% endif %}
   </div>
 
   <section id="receitas">
     <div class="wrap">
       <div class="section-head">
-        <h2>Receitas em alta</h2>
-        <a href="#">Ver todas</a>
+        <h2>
+          {% if query %}
+            Resultados para "{{ query }}"
+          {% elif selected_category %}
+            Categoria: {{ selected_category }}
+          {% else %}
+            Receitas em alta
+          {% endif %}
+        </h2>
+        {% if query or selected_category %}
+          <a href="{% url 'recipes:home' %}">Limpar filtro</a>
+        {% else %}
+          <a href="#receitas">Ver todas</a>
+        {% endif %}
       </div>
-      <div class="grid">
-        <article class="card">
-          <div class="thumb" aria-hidden="true">🍅</div>
-          <div class="card-body">
-            <div class="tag">Massas</div>
-            <h3>Macarrão ao molho de tomate fresco</h3>
-            <p>Molho feito na hora, com manjericão e um fio de azeite.</p>
-            <div class="info"><span>⏱ 25 min</span><span>Fácil</span></div>
-          </div>
-        </article>
-        <article class="card">
-          <div class="thumb" aria-hidden="true">🥗</div>
-          <div class="card-body">
-            <div class="tag">Saladas</div>
-            <h3>Salada de grão-de-bico com limão</h3>
-            <p>Fresca, nutritiva e pronta sem ligar o fogão.</p>
-            <div class="info"><span>⏱ 15 min</span><span>Fácil</span></div>
-          </div>
-        </article>
-        <article class="card" href = "/recipes/3/" >
-          <button class="thumb" aria-hidden="true" href = "recipes/3/">🍰</button>
-          <div class="card-body">
-            <div class="tag">Sobremesas</div>
-            <h3>Bolo de cenoura com cobertura de chocolate</h3>
-            <p>Massa fofinha feita no liquidificador, sem erro.</p>
-            <div class="info"><span>⏱ 1 h</span><span>Médio</span></div>
-          </div>
-        </article>
-      </div>
+
+      {% if meals %}
+        <div class="grid">
+          {% for meal in meals %}
+            <a class="card" href="{% url 'recipes:recipe' meal.meal_id %}">
+              <div class="thumb">
+                {% if meal.thumb_url %}
+                  <img src="{{ meal.thumb_url }}" alt="{{ meal.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                  🍽️
+                {% endif %}
+              </div>
+              <div class="card-body">
+                <div class="tag">{{ meal.category }}</div>
+                <h3>{{ meal.title }}</h3>
+                <p>{{ meal.instructions|truncatewords:14 }}</p>
+                <div class="info">
+                  <span>🌍 {{ meal.area }}</span>
+                  <span>🥘 {{ meal.ingredients_json|length }} itens</span>
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color: var(--ink-soft);">
+          Nenhuma receita encontrada no banco local ainda. O Celery já foi acionado para buscar na API — aguarde alguns segundos e atualize a página!
+        </p>
+      {% endif %}
     </div>
   </section>
 
@@ -80,28 +112,644 @@
         <h2>Explore por categoria</h2>
       </div>
       <div class="cats">
-        <a class="cat" href="#"><span aria-hidden="true">🥩</span><strong>Carnes</strong><em>182 receitas</em></a>
-        <a class="cat" href="#"><span aria-hidden="true">🐟</span><strong>Peixes e frutos do mar</strong><em>96 receitas</em></a>
-        <a class="cat" href="#"><span aria-hidden="true">🥦</span><strong>Vegetarianas</strong><em>140 receitas</em></a>
-        <a class="cat" href="#"><span aria-hidden="true">🍞</span><strong>Pães e lanches</strong><em>74 receitas</em></a>
+        <a class="cat" href="{% url 'recipes:home' %}?category=Beef#receitas">
+          <span aria-hidden="true">🥩</span>
+          <strong>Carnes (Beef)</strong>
+          <em>Ver receitas</em>
+        </a>
+        <a class="cat" href="{% url 'recipes:home' %}?category=Seafood#receitas">
+          <span aria-hidden="true">🐟</span>
+          <strong>Peixes e frutos do mar</strong>
+          <em>Ver receitas</em>
+        </a>
+        <a class="cat" href="{% url 'recipes:home' %}?category=Vegetarian#receitas">
+          <span aria-hidden="true">🥦</span>
+          <strong>Vegetarianas</strong>
+          <em>Ver receitas</em>
+        </a>
+        <a class="cat" href="{% url 'recipes:home' %}?category=Dessert#receitas">
+          <span aria-hidden="true">🍰</span>
+          <strong>Sobremesas</strong>
+          <em>Ver receitas</em>
+        </a>
       </div>
     </div>
   </section>
-
-  <section id="newsletter">
-    <div class="wrap">
-      <div class="news">
-        <h2>Uma receita nova na sua caixa de entrada toda semana.</h2>
-        <form class="search" onsubmit="return false">
-          <input type="email" placeholder="Seu melhor e-mail" aria-label="E-mail">
-          <button class="btn" type="submit">Assinar</button>
-        </form>
-      </div>
-    </div>
-  </section>
-</main>
 
 {% include "recipes/partials/footer.html" %}
 
 </body>
 </html>
+<style>
+
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Young+Serif&display=swap");
+
+/* ---------- Tokens ---------- */
+:root {
+  --bg: #f5f7f1;
+  --surface: #ffffff;
+  --ink: #1b2a24;
+  --ink-soft: #55645c;
+  --green: #2f6b4f;
+  --green-dark: #1f4d3a;
+  --leaf: #e3eedf;
+  --pepper: #c8372d;
+  --saffron: #f0b429;
+  --line: #dde4d8;
+
+  --font-display: "Young Serif", Georgia, "Times New Roman", serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-pill: 999px;
+
+  --shadow: 0 1px 2px rgba(27, 42, 36, 0.06), 0 6px 18px rgba(27, 42, 36, 0.06);
+  --maxw: 1120px;
+}
+.card {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f1f5f9;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+}
+
+.card .thumb {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.card .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 18px 20px;
+    background: #ffffff;
+}
+
+.card .tag {
+    align-self: flex-start;
+    background-color: #e8f5e9;
+    color: #1b5e20;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+}
+
+.card h3 {
+    color: #1e293b;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+}
+
+.card p {
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    margin: 0 0 16px 0;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card .info {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #475569;
+}
+
+/* ---------- Reset leve ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.15;
+  margin: 0;
+  color: var(--ink);
+}
+
+p {
+  margin: 0;
+}
+
+:focus-visible {
+  outline: 3px solid var(--saffron);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ---------- Layout ---------- */
+.wrap {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+}
+
+section {
+  padding-block: 3.5rem;
+}
+
+/* ---------- Header ---------- */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(245, 247, 241, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  min-height: 4rem;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  text-decoration: none;
+  color: var(--green-dark);
+}
+
+.logo span {
+  font-size: 1.5rem;
+}
+
+.nav nav {
+  margin-inline: auto;
+}
+
+.nav ul {
+  display: flex;
+  gap: 1.75rem;
+  list-style: none;
+}
+
+.nav ul a {
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--ink-soft);
+  padding-block: 0.25rem;
+  border-bottom: 2px solid transparent;
+}
+
+.nav ul a:hover {
+  color: var(--ink);
+  border-bottom-color: var(--saffron);
+}
+
+/* ---------- Botões ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.35rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--green);
+  color: #fff;
+  font: 600 0.95rem/1 var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.btn:hover {
+  background: var(--green-dark);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--green-dark);
+  box-shadow: inset 0 0 0 2px var(--green);
+}
+
+.btn--ghost:hover {
+  background: var(--leaf);
+}
+
+/* ---------- Formulário de busca / newsletter ---------- */
+.search {
+  display: flex;
+  gap: 0.5rem;
+  max-width: 34rem;
+  padding: 0.4rem;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  padding: 0.5rem 1rem;
+  font: 500 1rem var(--font-body);
+  color: var(--ink);
+}
+
+.search input::placeholder {
+  color: #8a978f;
+}
+
+.search input:focus {
+  outline: none;
+}
+
+.search:focus-within {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(47, 107, 79, 0.2);
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  align-items: center;
+  gap: 3rem;
+  padding-block: 4rem 3rem;
+}
+
+.hero h1 {
+  font-size: clamp(2.25rem, 5vw, 3.6rem);
+  letter-spacing: -0.01em;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  max-width: 34rem;
+  margin-bottom: 1.75rem;
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+}
+
+/* Receita do dia: o elemento marcante da página */
+.today {
+  position: relative;
+  display: block;
+  padding: 2rem;
+  border-radius: 28px;
+  background: var(--green-dark);
+  color: #fff;
+  text-decoration: none;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.today::before {
+  content: "";
+  position: absolute;
+  top: -4.5rem;
+  right: -4.5rem;
+  width: 15rem;
+  height: 15rem;
+  border-radius: 50%;
+  background: var(--saffron);
+}
+
+.today .emoji {
+  position: relative;
+  font-size: 4.5rem;
+  line-height: 1;
+  margin-bottom: 4rem;
+}
+
+.today small {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--saffron);
+}
+
+.today h2 {
+  color: #fff;
+  font-size: 1.6rem;
+  margin-bottom: 1rem;
+}
+
+.today .meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.today .meta span {
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.14);
+  font-size: 0.875rem;
+}
+
+.today:hover h2 {
+  text-decoration: underline;
+  text-decoration-color: var(--saffron);
+  text-underline-offset: 4px;
+}
+
+/* ---------- Cabeçalho de seção ---------- */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.section-head h2 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.section-head a {
+  font-weight: 600;
+  color: var(--green);
+  text-underline-offset: 3px;
+}
+
+.section-head a:hover {
+  color: var(--green-dark);
+}
+
+/* ---------- Cards de receita ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card:hover {
+  border-color: var(--green);
+  box-shadow: var(--shadow);
+}
+
+.card .thumb {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 9.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--leaf);
+  font-size: 3.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.card:nth-child(2) .thumb {
+  background: #f9ecc4;
+}
+
+.card:nth-child(3) .thumb {
+  background: #f6d9d4;
+}
+
+.card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+}
+
+.tag {
+  align-self: flex-start;
+  padding: 0.15rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--leaf);
+  color: var(--green-dark);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.card h3 {
+  font-size: 1.2rem;
+}
+
+.card-body p {
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.info {
+  display: flex;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+/* ---------- Categorias ---------- */
+#categorias {
+  background: var(--surface);
+  border-block: 1px solid var(--line);
+}
+
+.cats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1rem;
+}
+
+.cat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "icon name"
+    "icon count";
+  align-items: center;
+  column-gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  text-decoration: none;
+}
+
+.cat:hover {
+  background: var(--leaf);
+}
+
+.cat span {
+  grid-area: icon;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.cat strong {
+  grid-area: name;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.cat em {
+  grid-area: count;
+  font-style: normal;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
+/* ---------- Newsletter ---------- */
+.news {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+  gap: 2rem;
+  padding: 2.5rem;
+  border-radius: 28px;
+  background: var(--saffron);
+}
+
+.news h2 {
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+  color: var(--ink);
+}
+
+.news .search {
+  max-width: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.news .btn {
+  background: var(--ink);
+}
+
+.news .btn:hover {
+  background: #000;
+}
+
+/* ---------- Footer (partials/footer.html) ---------- */
+footer {
+  padding-block: 2rem;
+  margin-top: 2rem;
+  background: var(--green-dark);
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+footer a {
+  color: #fff;
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 820px) {
+  .hero,
+  .news {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding-block: 2.5rem 2rem;
+    gap: 2rem;
+  }
+
+  .news {
+    padding: 1.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav nav {
+    display: none; /* troque por um menu hambúrguer quando quiser */
+  }
+
+  .nav {
+    justify-content: space-between;
+  }
+
+  section {
+    padding-block: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  * {
+    transition: none !important;
+  }
+}
+</style>
