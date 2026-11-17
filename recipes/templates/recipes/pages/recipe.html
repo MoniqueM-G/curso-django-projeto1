@@ -1,4 +1,4 @@
-{% load static %} {% comment %} Carrega os arquivos estáticos (estilo, imagens, dados que vão ser sempre os mesmos) {% endcomment %}
+{% load static %} 
 {% include "recipes/partials/head.html" %}
 <link rel="stylesheet" href="{% static 'recipes/styles_recipe.css' %}">
 </head>
@@ -6,33 +6,43 @@
 
 <header>
   <div class="wrap nav">
-    <a class="logo" href="receitas-home.html"><span>🍲</span> Panela Cheia</a>
+    <a class="logo" href="{% url 'recipes:home' %}"> Busca de Receitas</a>
     <a class="btn" href="#">Entrar</a>
   </div>
 </header>
 
 <main class="wrap">
-  <p class="crumbs"><a href="receitas-home.html">Receitas</a> / <a href="#">Sobremesas</a> / Bolo de cenoura</p>
+  <p class="crumbs">
+    <a href="{% url 'recipes:home' %}">Receitas</a> / 
+    <a href="#">{{ recipe.category }}</a> / 
+    {{ recipe.title }}
+  </p>
 
   <div class="top">
     <div>
-      <div class="tag">Sobremesas</div>
-      <h1>Bolo de cenoura com cobertura de chocolate</h1>
-      <p class="lead">Massa fofinha e úmida, feita toda no liquidificador, com uma calda de chocolate que endurece de leve por cima. Dá certo de primeira.</p>
+      <div class="tag">{{ recipe.category }} · {{ recipe.area }}</div>
+      <h1>{{ recipe.title }}</h1>
+      <p class="lead">Receita tradicional da culinária {{ recipe.area }}, importada diretamente do catálogo internacional.</p>
       <div class="actions">
         <button class="btn" type="button" onclick="document.getElementById('preparo').scrollIntoView()">Ir para o preparo</button>
         <button class="btn ghost" type="button" id="salvar" aria-pressed="false">🤍 Salvar receita</button>
         <button class="btn ghost" type="button" onclick="window.print()">Imprimir</button>
       </div>
     </div>
-    <div class="visual" aria-hidden="true">🍰</div>
+    <div class="visual">
+      {% if recipe.image %}
+        <img src="{{ recipe.image }}" alt="{{ recipe.title }}" style="max-width: 100%; border-radius: 12px;">
+      {% else %}
+        🍽️
+      {% endif %}
+    </div>
   </div>
 
   <div class="facts">
-    <div class="fact"><strong>20 min</strong><span>Preparo</span></div>
-    <div class="fact"><strong>40 min</strong><span>Forno</span></div>
-    <div class="fact"><strong>Fácil</strong><span>Dificuldade</span></div>
-    <div class="fact"><strong>10 fatias</strong><span>Rendimento</span></div>
+    <div class="fact"><strong>{{ recipe.area }}</strong><span>Origem</span></div>
+    <div class="fact"><strong>{{ recipe.ingredients|length }} itens</strong><span>Ingredientes</span></div>
+    <div class="fact"><strong>{{ recipe.steps|length }} passos</strong><span>Etapas</span></div>
+    <div class="fact"><strong>4 porções</strong><span>Rendimento base</span></div>
   </div>
 
   <div class="content">
@@ -42,119 +52,60 @@
         <span>Porções</span>
         <div class="stepper">
           <button type="button" id="menos" aria-label="Diminuir porções">−</button>
-          <output id="porcoes" aria-live="polite">10</output>
+          <output id="porcoes" aria-live="polite">4</output>
           <button type="button" id="mais" aria-label="Aumentar porções">+</button>
         </div>
       </div>
 
-      <h3>Massa</h3>
       <ul class="check">
-        <li><label><input type="checkbox"><span><b class="q" data-q="3">3</b> cenouras médias em rodelas</span></label></li>
-        <li><label><input type="checkbox"><span><b class="q" data-q="4">4</b> ovos</span></label></li>
-        <li><label><input type="checkbox"><span><b class="q" data-q="0.5">½</b> xícara de óleo</span></label></li>
-        <li><label><input type="checkbox"><span><b class="q" data-q="2">2</b> xícaras de açúcar</span></label></li>
-        <li><label><input type="checkbox"><span><b class="q" data-q="2.5">2½</b> xícaras de farinha de trigo</span></label></li>
-        <li><label><input type="checkbox"><span><b class="q" data-q="1">1</b> colher (sopa) de fermento</span></label></li>
-      </ul>
-
-      <h3>Cobertura</h3>
-      <ul class="check">
-        <li><label><input type="checkbox"><span><b class="q" data-q="1">1</b> xícara de açúcar</span></label></li>
-        <li><label><input type="checkbox"><span><b class="q" data-q="3">3</b> colheres (sopa) de chocolate em pó</span></label></li>
-        <li><label><input type="checkbox"><span><b class="q" data-q="1">1</b> colher (sopa) de manteiga</span></label></li>
-        <li><label><input type="checkbox"><span><b class="q" data-q="0.5">½</b> xícara de leite</span></label></li>
+        {% for item in recipe.ingredients %}
+          <li>
+            <label>
+              <input type="checkbox">
+              <span>
+                {% if item.qty %}
+                  <b class="q" data-q="{{ item.qty }}">{{ item.display_qty }}</b>
+                {% endif %}
+                {{ item.description }}
+              </span>
+            </label>
+          </li>
+        {% endfor %}
       </ul>
     </aside>
 
     <section id="preparo" aria-labelledby="prep-titulo">
       <h2 id="prep-titulo">Modo de preparo</h2>
       <ol class="steps">
-        <li>
-          <strong>Prepare a forma</strong>
-          <p>Ligue o forno a 180 °C. Unte uma forma de 25 cm com furo no meio com manteiga e farinha.</p>
-        </li>
-        <li>
-          <strong>Bata a massa</strong>
-          <p>No liquidificador, bata as cenouras, os ovos e o óleo até ficar liso. Junte o açúcar e bata mais um pouco.</p>
-        </li>
-        <li>
-          <strong>Misture a farinha</strong>
-          <p>Despeje o líquido em uma tigela, adicione a farinha e mexa com um fouet até sumirem os grumos. Por último, misture o fermento com cuidado.</p>
-        </li>
-        <li>
-          <strong>Asse</strong>
-          <p>Coloque a massa na forma e asse por cerca de 40 minutos. O bolo está pronto quando um palito sai limpo do centro.</p>
-        </li>
-        <li>
-          <strong>Faça a cobertura</strong>
-          <p>Em uma panela, leve ao fogo baixo o açúcar, o chocolate, a manteiga e o leite. Mexa por 3 a 4 minutos, até a calda borbulhar e engrossar.</p>
-        </li>
-        <li>
-          <strong>Cubra e sirva</strong>
-          <p>Desenforme o bolo ainda morno, despeje a calda por cima e espere firmar por 15 minutos antes de cortar.</p>
-        </li>
+        {% for step in recipe.steps %}
+          <li>
+            <strong>Passo {{ forloop.counter }}</strong>
+            <p>{{ step }}</p>
+          </li>
+        {% endfor %}
       </ol>
-
-      <div class="tip">
-        <strong>Dica para o bolo ficar mais fofinho</strong>
-        <p>Não bata a massa depois de colocar a farinha e o fermento. Misturar demais deixa o bolo denso.</p>
-      </div>
     </section>
   </div>
 
+  {% if related_meals %}
   <section class="related" aria-labelledby="rel-titulo">
     <h2 id="rel-titulo">Você também vai gostar</h2>
     <div class="grid">
-      <a class="card" href="#">
-        <div class="thumb" aria-hidden="true">🍫</div>
-        <div class="card-body"><h3>Brigadeiro de panela</h3><p>⏱ 20 min · Fácil</p></div>
-      </a>
-      <a class="card" href="#">
-        <div class="thumb" aria-hidden="true">🍋</div>
-        <div class="card-body"><h3>Mousse de limão de 3 ingredientes</h3><p>⏱ 10 min · Fácil</p></div>
-      </a>
-      <a class="card" href="#">
-        <div class="thumb" aria-hidden="true">🥧</div>
-        <div class="card-body"><h3>Torta de banana com canela</h3><p>⏱ 50 min · Médio</p></div>
-      </a>
+      {% for rel in related_meals %}
+        <a class="card" href="{% url 'recipes:recipe' rel.meal_id %}">
+          <div class="thumb">
+            <img src="{{ rel.strMealThumb }}" alt="{{ rel.strMeal }}" style="width:100%; height:120px; object-fit:cover;">
+          </div>
+          <div class="card-body">
+            <h3>{{ rel.strMeal }}</h3>
+            <p>{{ recipe.category }}</p>
+          </div>
+        </a>
+      {% endfor %}
     </div>
   </section>
+  {% endif %}
 </main>
-
 {% include "recipes/partials/footer.html" %}
-
-<script>
-  // Ajuste de porções: recalcula as quantidades proporcionalmente
-  const base = 10;
-  let porcoes = base;
-  const saida = document.getElementById('porcoes');
-  const quantidades = document.querySelectorAll('.q');
-
-  function formatar(n) {
-    const arredondado = Math.round(n * 4) / 4;
-    const inteiro = Math.floor(arredondado);
-    const fracao = { 0: '', 0.25: '¼', 0.5: '½', 0.75: '¾' }[arredondado - inteiro];
-    if (arredondado < 0.25) return '¼';
-    return (inteiro > 0 ? inteiro : '') + fracao;
-  }
-
-  function atualizar() {
-    saida.textContent = porcoes;
-    quantidades.forEach(el => {
-      el.textContent = formatar(parseFloat(el.dataset.q) * porcoes / base);
-    });
-  }
-
-  document.getElementById('mais').addEventListener('click', () => { if (porcoes < 40) { porcoes += 2; atualizar(); } });
-  document.getElementById('menos').addEventListener('click', () => { if (porcoes > 2) { porcoes -= 2; atualizar(); } });
-
-  // Botão de salvar
-  const salvar = document.getElementById('salvar');
-  salvar.addEventListener('click', () => {
-    const ativo = salvar.getAttribute('aria-pressed') === 'true';
-    salvar.setAttribute('aria-pressed', String(!ativo));
-    salvar.textContent = ativo ? '🤍 Salvar receita' : '❤️ Receita salva';
-  });
-</script>
 </body>
 </html>
