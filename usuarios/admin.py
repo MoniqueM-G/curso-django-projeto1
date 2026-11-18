@@ -9,3 +9,4 @@ class UsersAdmin(admin_auth_django.UserAdmin): #herda da classe ja existente do 
     add_form = UserCreationForm
     model = Users
     fieldsets = admin_auth_django.UserAdmin.fieldsets + ( ('Cargo', {'fields' : ('cargo',)}),) # pegua os campos que ja existem em admin + o campo criado
+ 
