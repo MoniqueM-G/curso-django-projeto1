@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     #coloca os apps aqui
     'recipes',
     'usuarios',
+    'rolepermissions',
 ]
 
 MIDDLEWARE = [
@@ -134,3 +135,7 @@ CELERY_TASK_SERIALIZER = 'json'
 
 #Config auth
 AUTH_USER_MODEL = 'usuarios.Users'
+
+#Role permissions
+
+ROLEPERMISSIONS_MODULE = 'projeto.roles'
