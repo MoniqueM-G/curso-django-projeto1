@@ -137,7 +137,19 @@
   </section>
 
 {% include "recipes/partials/footer.html" %}
-
+{% if receitas_recentes %}
+<section class= "vistos-recentemente">
+<h3>Você viu recentemente</h3>
+<div class="lista-cards">
+{% for receita in receitas_recentes in  %}
+<div class= "card"> <a href= "{% url "recipes:recipe" receita.id %}">
+  <h4>{{receita.title}}</h4>
+</a>
+</div>
+{% endfor %}
+</div>
+</section>
+{% endif %}
 </body>
 </html>
 <style>
