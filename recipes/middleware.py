@@ -10,11 +10,11 @@ class RecipeHistory:
         if response.status_code == 200 and request.path.startswith('/recipes/'):
             partes = request.path.strip('/').split('/')
            
-            if len(partes) == 2 in partes[1].isdigit():
+            if len(partes) == 2 and partes[1].isdigit():
                 recipe_id = int(partes[1])
-                historico = request.session.get('receitas_vistas',[])
-                if recipe_id in historico:
-                    historico.remove(recipe_id)
-                historico.insert(0,recipe_id)
-                request.session['receitas_vistas'] = historico[:5]
+                history = request.session.get('recent_recipes',[])
+                if recipe_id in history:
+                    history.remove(recipe_id)
+                history.insert(0,recipe_id)
+                request.session['recent_recipes'] = history[:6]
         return response

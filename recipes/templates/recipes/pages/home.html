@@ -11,7 +11,6 @@
       <ul>
         <li><a href="#receitas">Receitas</a></li>
         <li><a href="#categorias">Categorias</a></li>
-        <li><a href="#newsletter">Newsletter</a></li>
       </ul>
     </nav>
     <a class="btn" href="#">Entrar</a>
@@ -106,6 +105,37 @@
     </div>
   </section>
 
+{% if recent_recipes %}
+  <section class="history" style="margin-top: 3rem;">
+    <div class="wrap">
+    <div class="section-head">
+      <h2>Você viu recentemente</h2>
+    </div>
+    <div class="grid">
+      {% for recipe in recent_recipes %}
+        <a class="card" href="{% url 'recipes:recipe' recipe.meal_id %}">
+          <div class="thumb">
+            {% if recipe.thumb_url %}
+              <img src="{{ recipe.thumb_url }}" alt="{{ recipe.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+              🍽️
+            {% endif %}
+          </div>
+          <div class="card-body">
+            <div class="tag">{{ recipe.category }}</div>
+            <h3>{{ recipe.title }}</h3>
+            <div class="info">
+              <span>🌍 {{ recipe.area }}</span>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+    </div>
+  </section>
+{% endif %}
+
+
   <section id="categorias">
     <div class="wrap">
       <div class="section-head">
@@ -135,21 +165,8 @@
       </div>
     </div>
   </section>
+    {% include "recipes/partials/footer.html" %}
 
-{% include "recipes/partials/footer.html" %}
-{% if receitas_recentes %}
-<section class= "vistos-recentemente">
-<h3>Você viu recentemente</h3>
-<div class="lista-cards">
-{% for receita in receitas_recentes in  %}
-<div class= "card"> <a href= "{% url "recipes:recipe" receita.id %}">
-  <h4>{{receita.title}}</h4>
-</a>
-</div>
-{% endfor %}
-</div>
-</section>
-{% endif %}
 </body>
 </html>
 <style>
@@ -678,36 +695,6 @@ header {
   font-style: normal;
   font-size: 0.875rem;
   color: var(--ink-soft);
-}
-
-/* ---------- Newsletter ---------- */
-.news {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  align-items: center;
-  gap: 2rem;
-  padding: 2.5rem;
-  border-radius: 28px;
-  background: var(--saffron);
-}
-
-.news h2 {
-  font-size: clamp(1.4rem, 3vw, 1.9rem);
-  color: var(--ink);
-}
-
-.news .search {
-  max-width: none;
-  box-shadow: none;
-  border-color: transparent;
-}
-
-.news .btn {
-  background: var(--ink);
-}
-
-.news .btn:hover {
-  background: #000;
 }
 
 /* ---------- Footer (partials/footer.html) ---------- */
